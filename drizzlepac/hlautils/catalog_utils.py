@@ -25,7 +25,7 @@ from stwcs.wcsutil import HSTWCS
 
 from drizzlepac import util
 from drizzlepac.hlautils import astrometric_utils
-
+from drizzlepac.hlautils import background_median, photometry_tools
 
 try:
     from matplotlib import pyplot as plt
@@ -358,6 +358,20 @@ class hap_point_catalog(hap_catalog):
         phot_table = aperture_photometry(image, apertures)
 
         for col in phot_table.colnames: phot_table[col].info.format = '%.8g'  # for consistent table output
+
+        #>>>>>>>>>>>>>>>>>> ADAPTION OF HLA CLASSIC CODE 'HLA_SOURCELIST' SUBROUTINE 'DAOPHOT_STYLE_PHOTOMETRY' LINE 1019 <<<<<<<<<<<
+        print("\a")
+        pdb.set_trace()
+        platescale = self.param_dict['astrodrizzle']['scale']
+        aper_radius_arcsec = [self.param_dict['dao']['aperture_1'],self.param_dict['dao']['aperture_2']]
+        aper_radius_list_pixels =[]
+
+
+
+
+        photometry_table = photometry_tools.iraf_style_photometry()
+
+
         return(phot_table)
 
 
