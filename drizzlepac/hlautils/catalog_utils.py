@@ -331,7 +331,7 @@ class hap_point_catalog(hap_catalog):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-    def perform_point_photometry(self,sources,aper_radius=4.):
+    def perform_point_photometry(self,sources,aper_radius=4.,annulus = 0.025):
         """Perform aperture photometry on identified sources
 
         Parameters
@@ -348,31 +348,50 @@ class hap_point_catalog(hap_catalog):
             Table containing photometric information for specified sources based on image data in the specified image.
         """
         # Open and background subtract image
-        image = self.imghdu['SCI'].data.copy()
-        image -= np.nanmedian(image)
-
-
-        # Aperture Photometry
-        positions = (sources['xcentroid'], sources['ycentroid'])
-        apertures = CircularAperture(positions, r=aper_radius)
-        phot_table = aperture_photometry(image, apertures)
-
-        for col in phot_table.colnames: phot_table[col].info.format = '%.8g'  # for consistent table output
-
+        # image = self.imghdu['SCI'].data.copy()
+        # image -= np.nanmedian(image)
+        #
+        #
+        # # Aperture Photometry
+        # positions = (sources['xcentroid'], sources['ycentroid'])
+        # apertures = CircularAperture(positions, r=aper_radius)
+        # phot_table = aperture_photometry(image, apertures)
+        #
+        # for col in phot_table.colnames: phot_table[col].info.format = '%.8g'  # for consistent table output
+        # return (phot_table)
         #>>>>>>>>>>>>>>>>>> ADAPTION OF HLA CLASSIC CODE 'HLA_SOURCELIST' SUBROUTINE 'DAOPHOT_STYLE_PHOTOMETRY' LINE 1019 <<<<<<<<<<<
-        print("\a")
-        pdb.set_trace()
-        platescale = self.param_dict['astrodrizzle']['scale']
+
+        platescale = self.param_dict['astrodrizzle']['SCALE'] #arcsec/pixel
+
+        annulus_arcsec = 0.25 # TODO: PUT THIS STUFF INTO CONFIGS
+        annulus_pix = annulus_arcsec/platescale
+
+        dannulus_arcsec = 0.25 # TODO: PUT THIS STUFF INTO CONFIGS
+        dannulus_pix = dannulus_arcsec/platescale
+
+        ab_zeropoint = 26.5136022236
+        gain = 5060.0
+        readnoise = 4.97749985
+
+
+        # convert photometric aperture radii from arcsec to pixels
         aper_radius_arcsec = [self.param_dict['dao']['aperture_1'],self.param_dict['dao']['aperture_2']]
         aper_radius_list_pixels =[]
+        for aper_radius in aper_radius_arcsec:
+            aper_radius_list_pixels.append(aper_radius/platescale)
 
+
+
+
+        print("\a")
+        pdb.set_trace()
 
 
 
         photometry_table = photometry_tools.iraf_style_photometry()
 
 
-        return(phot_table)
+
 
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
