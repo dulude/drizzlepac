@@ -637,7 +637,7 @@ class HAPPointCatalog(HAPCatalogBase):
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 
-    def write_catalog(self, write_region_file=False):
+    def write_catalog(self, write_region_file=True):
         """Write specified catalog to file on disk
 
         Parameters
