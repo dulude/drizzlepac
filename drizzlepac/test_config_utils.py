@@ -22,11 +22,10 @@ for total_item in total_list:
 param_filename = "superparamfile.json"
 
 for item in product_list:
-    item.pars = config_utils.HapConfig(item,output_custom_pars_file=param_filename,use_defaults=False)
+    item.pars = config_utils.HapConfig(item)#output_custom_pars_file=param_filename,use_defaults=False)
 #
 print(" ")
-print(product_list[1].pars.get_pars("alignment"))
-
+print(product_list[1].pars.get_pars("astrodrizzle"))
 
 # rv = hapsequencer.run_hla_processing(input_filename)
 # pdb.set_trace()

@@ -351,6 +351,21 @@ class Par():
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
+    def _flatten_dict(self, current, key, result):
+        """Flatten nested dictionaries into a non-nested dictionary. Assumes that there are no non-unique keys.
+        Code credit: https://stackoverflow.com/questions/24448543/how-would-i-flatten-a-nested-dictionary-in-python-3
+        Solution submitted by user 'Matthew Franglen'.
+        """
+        if isinstance(current, dict):
+            for k in current:
+                new_key = "{1}".format(key, k) if len(key) > 0 else k
+                self._flatten_dict(current[k], new_key, result)
+        else:
+            result[key] = current
+        return result
+
+# - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
     def _get_params(self):
         """read in params from config files based on instrument, detector, and condition(s), and return a ordered
         dictionary of these values."""
@@ -424,6 +439,7 @@ class AstrodrizzlePars(Par):
             self._read_custom_pars()
         else:
             self._combine_conditions()
+        self.outpars = self._flatten_dict(self.outpars, '', {})
 
 
 # ----------------------------------------------------------------------------------------------------------------------
