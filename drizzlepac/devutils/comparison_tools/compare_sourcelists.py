@@ -57,8 +57,14 @@ The following criteria must be met for the test to be declared "successful":
 
 Plots
 -----
-If the optional plot input is set to 'screen' or 'file', a plot of the difference histogram will be generated for each
-valid comparision (except for the bit-wise comparision, which is handled differently).
+Plots will be generated if the optional plot input is set to 'screen' or 'file'. If set to 'screen', the plots will be
+simply displayed on-screen, and not written to disk. If set to 'file', the plots will not be displayed on-screen and
+will be saved as .pdf files. The naming is self-explanatory: each file is named after the column being compared. In addition, a user-specified string can optionally be prepended to each plot .pdf filename to keep things orginized.
+Up to three different types of plots:
+
+* Difference histogram plots: These are the most commonly generated plot products are are produced for all column comparisions excet for the bit-wise comparion.
+* Bit value barcharts
+* X-Y absolute difference vector plot
 
 
 Path
