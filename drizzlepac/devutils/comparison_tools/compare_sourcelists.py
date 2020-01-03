@@ -1,28 +1,39 @@
 #!/usr/bin/env python
 # vim: tabstop=8 expandtab shiftwidth=4 softtabstop=4 ai :
-# TODO: UPDATE main docstring.
-"""This script compares two sourcelists and displays various measures of their differences. 3x3-sigma clipped mean,
-median and standard deviation, and non-sigma clipped min and max values are computed for the following:
+# TODO: UPDATE 'Regression testing' section of docstring
+"""This script compares sources common to two user-specified sourcelists and displays various measures of their
+differences. The differences can be calculated using one of three user-selectable methods:
 
-* X position
-* Y position
-* Right Ascension
-* Declination
-* Flux (Inner Aperture)
+* Absolute: Just a simple difference e.g. Comparision - Reference.
+* Overall mean percent difference:  Percent difference based on the **overall mean** reference value e.g. ((Comparision-Reference)/mean_overall(Reference)) x 100.
+* Dynamic percent difference: Percent difference values are calculated discretly for each pair of comparision/reference values e.g. ((Comparision[n]-Reference[n])/Reference[n]) x 100.
+
+3x3-sigma clipped mean, median and standard deviation, and non-sigma clipped min and max values are
+computed for the following:
+
+* Image X position (in pixels)
+* Image Y position (in pixels)
+* Right Ascension (in arcseconds)
+* Declination (in arcseconds)
 * Flux (Outer Aperture)
 * Magnitude (Inner Aperture)
 * Magnitude (Outer Aperture)
 * Magnitude Error (Inner Aperture)
 * Magnitude Error (Outer Aperture)
+* MSKY
+* STDDEV
+* CI (Concentration Index)
 
-Bit-wise comparisons are also performed for the following item:
+Absolute bit-wise comparisons are also performed for the following item:
 
 * Flag Value
 
 .. note::
-    Statistics (and optionally plots) for 'X position' and 'Y position' differences will always be displayed. However,
-    not every sourcelist or catalog file is guaranteed to have any of the seven remaining data columns in the above
-    list. Results for these seven columns will only be displayed if data columns are found in both input files.
+    Not all sourcelist types compatible with this comparision script contain all of the columns listed above.
+    Statistics (and optionally plots) can only be generated for columns common to both user-specified sourcelists.
+    Thus, it is to be expected that not all runs will yield comparisons for all columns listed above.
+
+
 
 Regression Testing
 ------------------
@@ -42,6 +53,13 @@ The following criteria must be met for the test to be declared "successful":
 
 .. note::
     Sigma-clipped values for mean, sigma, and median are computed using the astropy.stats.sigma_clipped_stats() routine with three rounds of three-sigma clipping.
+
+
+Plots
+-----
+If the optional plot input is set to 'screen' or 'file', a plot of the difference histogram will be generated for each
+valid comparision (except for the bit-wise comparision, which is handled differently).
+
 
 Path
 ----
@@ -986,7 +1004,7 @@ if __name__ == "__main__":
     PARSER.add_argument('-d', '--debugMode', required=False, choices=["True", "False"], default="False", help="Turn on debug mode? Default value is False.")
     PARSER.add_argument('-i', '--imageNames', required = False, nargs=2,help='A space-separated list of the fits images that were used to generate the input sourcelists. The first image corresponds to the first listed sourcelist, and so in. These will be used to improve the sourcelist alignment and matching.')
     PARSER.add_argument('-m', '--diffMode', required=False, choices=["absolute", "pmean","pdynamic"], default="pmean",
-                        help='How should the comp-ref difference be calculated? "absolute" is simply the straight comp-ref difference. "peman" is the mean percent difference ((C-R)/avg(R)) x 100. "pdynamic" is the dynamic percent difference ((C-R)/R) x 100. Default value is "pmean".')
+                        help='How should the comp-ref difference be calculated? "absolute" is simply the straight comp-ref difference. "pmean" is the mean percent difference ((C-R)/avg(R)) x 100. "pdynamic" is the dynamic percent difference ((C-R)/R) x 100. Default value is "pmean".')
     PARSER.add_argument('-p', '--plotGen', required=False, choices=["screen","file","none"], default="none",help='Generate Plots? "screen" displays plots on-screen. "file" saves them to a .pdf file, and "none" skips all plot generation.')
     PARSER.add_argument('-s', '--plotfile_prefix_string', required = False, default="", help="text string that will prepend the plot files generated if plots are written to files ***REQUIRES the -p option set to 'file'***")
     PARSER.add_argument('-v', '--verbose', required=False, choices=["True", "False"], default="True",
