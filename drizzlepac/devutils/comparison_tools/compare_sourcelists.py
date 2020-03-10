@@ -458,7 +458,7 @@ def computeLinearStats(matchedRA, max_diff, x_axis_units, plotGen, plot_title, p
     for sig_val in [1.0, 2.0, 3.0]:
         sigma_percentages.append((float(np.shape(np.where((diffRA >= (clippedStats[0] - sig_val * clippedStats[2])) & (diffRA <= (clippedStats[0] + sig_val * clippedStats[2]))))[1])/float(np.shape(diffRA)[0])) * 100.0)
 
-    out_stats = "%11.7f %11.7f  %11.7f  %11.7f  %11.7f " % (clippedStats[0], clippedStats[1], clippedStats[2], sigma_percentages[2], 100.0-sigma_percentages[2])
+    out_stats = "%11.7f    %11.7f   %11.7f      %11.7f   %11.7f " % (clippedStats[0], clippedStats[1], clippedStats[2], sigma_percentages[2], 100.0-sigma_percentages[2])
 
     if ((sigma_percentages[2] >=95.0) and (abs(clippedStats[0])) <= max_diff):  # success condition: Greater than or equal to 95% of all difference values within 3-sigma of sigma-clipped mean
         regTestStatus = "OK      "
@@ -1351,18 +1351,26 @@ def comparesourcelists(slNames=None, imgNames=None, good_flag_sum = 255, plotGen
         lenList.append(len(item))
     totalPaddedSize = max(lenList) + 3
     log_output_string_list.append("{}{}".format(" " * 35, "REGRESSION TESTING SUMMARY"))
-    log_output_string_list.append("-" * (70 + totalPaddedSize))
-    log_output_string_list.append("{}{}".format(" " * (totalPaddedSize + 46), "% within     % beyond"))
-    log_output_string_list.append(
-        "COLUMN{}STATUS   MEAN        MEDIAN       STD DEV     3\u03C3 of mean   3\u03C3 of mean".format(
-            " " * (totalPaddedSize - 6)))
+    log_output_string_list.append("-" * (79 + totalPaddedSize))
+    topstring = "3x3\u03C3-CLIPPED   "
+    log_output_string_list.append("{}{}{}{}{}".format(" " * (totalPaddedSize + 9),topstring,topstring,topstring,"% within     % beyond"))
+    log_output_string_list.append("COLUMN{}STATUS   MEAN           MEDIAN         STD DEV        3\u03C3 of mean   3\u03C3 of mean".format(" " * (totalPaddedSize - 6)))
     overallStatus = "OK"
     for colTitle in colTitles:
-        log_output_string_list.append(
-            "%s%s%s" % (colTitle, "." * (totalPaddedSize - len(colTitle)), regressionTestResults[colTitle]))
-        if not regressionTestResults[colTitle].startswith("OK"):
-            overallStatus = "FAILURE"
-    log_output_string_list.append("-" * (70 + totalPaddedSize))
+        if colTitle == "Source Flagging":
+            log_output_string_list.append("")
+            log_output_string_list.append("{}Percentage of all matched sources".format(" " * (totalPaddedSize+10)))
+            log_output_string_list.append("{}STATUS    with flag value differences".format(" " * totalPaddedSize))
+            log_output_string_list.append(
+                "%s%s%s" % (colTitle, "." * (totalPaddedSize - len(colTitle)), regressionTestResults[colTitle]))
+            if not regressionTestResults[colTitle].startswith("OK"):
+                overallStatus = "FAILURE"
+        else:
+            log_output_string_list.append(
+                "%s%s%s" % (colTitle, "." * (totalPaddedSize - len(colTitle)), regressionTestResults[colTitle]))
+            if not regressionTestResults[colTitle].startswith("OK"):
+                overallStatus = "FAILURE"
+    log_output_string_list.append("-" * (79 + totalPaddedSize))
     log_output_string_list.append("OVERALL TEST STATUS{}{}".format("." * (totalPaddedSize - 19), overallStatus))
     for log_line in log_output_string_list:
         log.info(log_line)
@@ -1381,7 +1389,6 @@ def comparesourcelists(slNames=None, imgNames=None, good_flag_sum = 255, plotGen
                 stat_text_blob += log_line + "\n"
             else:
                 stat_text_blob += "\n"
-
         stat_text_blob += "\n\nGenerated {}\n".format(datetime.now().strftime("%m/%d/%Y %H:%M:%S"))
         stat_text_blob += "Comparison Sourcelist: {}\nReference Sourcelist:  {}".format(slNames[1], slNames[0])
         fig.text(0.5, 0.5, stat_text_blob, transform=fig.transFigure, size=10, ha="center", va="center",
