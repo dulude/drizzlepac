@@ -118,6 +118,7 @@ Classes and Functions
 ---------------------
 """
 import argparse
+import collections
 from datetime import datetime
 import os
 import pdb
@@ -1356,6 +1357,8 @@ def comparesourcelists(slNames=None, imgNames=None, good_flag_sum = 255, plotGen
     log_output_string_list.append("{}{}{}{}{}".format(" " * (totalPaddedSize + 9),topstring,topstring,topstring,"% within     % beyond"))
     log_output_string_list.append("COLUMN{}STATUS   MEAN           MEDIAN         STD DEV        3\u03C3 of mean   3\u03C3 of mean".format(" " * (totalPaddedSize - 6)))
     overallStatus = "OK"
+    if output_json_filename:
+        summary_dict = collections.OrderedDict()
     for colTitle in colTitles:
         if colTitle == "Source Flagging":
             log_output_string_list.append("")
@@ -1365,11 +1368,31 @@ def comparesourcelists(slNames=None, imgNames=None, good_flag_sum = 255, plotGen
                 "%s%s%s" % (colTitle, "." * (totalPaddedSize - len(colTitle)), regressionTestResults[colTitle]))
             if not regressionTestResults[colTitle].startswith("OK"):
                 overallStatus = "FAILURE"
+            if output_json_filename:
+                summary_dict[colTitle] = collections.OrderedDict()
+                column_name_list = ['status','Percentage of all matched sources with flag value differences']
+                for col_name, col_value in zip(column_name_list,regressionTestResults[colTitle].split()):
+                    if col_name != 'status':
+                        col_value = float(col_value)
+                    summary_dict[colTitle][col_name] = col_value
         else:
             log_output_string_list.append(
                 "%s%s%s" % (colTitle, "." * (totalPaddedSize - len(colTitle)), regressionTestResults[colTitle]))
             if not regressionTestResults[colTitle].startswith("OK"):
                 overallStatus = "FAILURE"
+
+            if output_json_filename:
+                column_name_list = ['status',
+                                    '3 x 3 sigma-clipped mean',
+                                    '3 x 3 sigma-clipped median',
+                                    '3 x 3 sigma-clipped standard deviation',
+                                    '% within 3σ of mean',
+                                    '% beyond 3σ of mean']
+                summary_dict[colTitle] = collections.OrderedDict()
+                for col_name, col_value in zip(column_name_list, regressionTestResults[colTitle].split()):
+                    if col_name != 'status':
+                        col_value = float(col_value)
+                    summary_dict[colTitle][col_name] = col_value
     log_output_string_list.append("-" * (79 + totalPaddedSize))
     log_output_string_list.append("OVERALL TEST STATUS{}{}".format("." * (totalPaddedSize - 19), overallStatus))
     for log_line in log_output_string_list:
@@ -1406,6 +1429,7 @@ def comparesourcelists(slNames=None, imgNames=None, good_flag_sum = 255, plotGen
 
     # Optionally write out diagnostic_utils .json file
     if output_json_filename:
+        diag_obj.add_data_item(summary_dict,"regression testing summary")
         diag_obj.write_json_file(output_json_filename, clobber=True)
     return (overallStatus)
 
