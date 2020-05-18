@@ -7,6 +7,7 @@ drizzlepac/hlautils/svm_quality_analysis.py and stores it as a Pandas DataFrame"
 import argparse
 import collections
 import glob
+import json
 import os
 import pdb
 import sys
@@ -175,6 +176,7 @@ def json_harvester(json_search_path=os.getcwd(), log_level=logutil.logging.INFO,
         master_dataframe.to_csv(output_filename)
         log.info("Wrote dataframe to {}".format(output_filename))
 
+    make_default_json_config_file(master_dataframe)
     return master_dataframe
 
 
@@ -241,8 +243,37 @@ def make_dataframe_line(json_filename_list, log_level=logutil.logging.INFO):
                 ingest_dict[title_suffix + ingest_key] = ingest_value
     return ingest_dict
 
+# ------------------------------------------------------------------------------------------------------------
 
-# ======================================================================================================================
+def make_default_json_config_file(master_dataframe):
+    """Generates default config file"""
+    initial_dict = {}
+    for item in sorted(master_dataframe.keys()):
+        initial_dict[item] = ("PLACEHOLDER HUMAN-READABLE TITLE","PLACEHOLDER METAVALUE")
+
+    config_dict = convert_nested(initial_dict)
+    with open('json_harvester_config.json', 'w') as f:
+        json.dump(config_dict, f, indent=4)
+
+
+def insert(dct, lst):
+    for x in lst[:-2]:
+        dct[x] = dct = dct.get(x, dict())
+    dct.update({lst[-2]: lst[-1]})
+
+def convert_nested(dct):
+    # empty dict to store the result
+    result = dict()
+
+    # create an iterator of lists
+    # representing nested or hierarchial flow
+    lsts = ([*k.split("."), v] for k, v in dct.items())
+
+    # insert each list into the result
+    for lst in lsts:
+        insert(result, lst)
+    return result
+    # ======================================================================================================================
 
 
 if __name__ == "__main__":
