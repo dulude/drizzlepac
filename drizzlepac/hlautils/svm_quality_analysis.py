@@ -618,7 +618,7 @@ def compare_photometry(drizzle_list, json_timestamp=None, json_time_since_epoch=
         summary_dict = {'detector': detector, 'filter_name': filter_name}
 
         # Construct the output JSON filename
-        json_filename = '_'.join([ipppss, detector, 'svm', filter_name, 'photometry.json'])
+        json_filename = '_'.join([ipppss, detector, filter_name, 'svm', 'photometry.json'])
 
         # Construct catalog names for catalogs that should have been produced
         # For any drizzled product, only two catalogs can be produced at most (point and segment).
