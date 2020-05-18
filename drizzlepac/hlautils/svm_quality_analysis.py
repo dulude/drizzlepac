@@ -1003,14 +1003,16 @@ def run_hla_sourcelist_comparison(total_list, diagnostic_mode=False, json_timest
                 log.info("HLA Classic catalog:         {}".format(os.path.basename(updated_hla_sourcelist_name)))
 
                 # once all file exist checks are passed, execute sourcelist comparision
+                for ending in ["point-cat.ecsv", "segment-cat.ecsv"]:
+                    if hap_sourcelist_name.endswith(ending):
+                        output_json_filename = "{}svm_{}_compare_sourcelists.json".format(hap_sourcelist_name.replace(ending,""), ending.replace("-cat.ecsv",""))
                 return_status = csl.comparesourcelists(slNames=[updated_hla_sourcelist_name,
                                                                 hap_sourcelist_name],
                                                        imgNames=[hla_imgname, hap_imgname],
                                                        good_flag_sum=255,
                                                        plotGen="file",
                                                        plotfile_prefix=plotfile_prefix,
-                                                       output_json_filename=hap_sourcelist_name.replace(".ecsv",
-                                                                                                        "_svm_compare_sourcelists.json"),
+                                                       output_json_filename=output_json_filename,
                                                        verbose=True,
                                                        log_level=log_level,
                                                        json_timestamp=json_timestamp,
