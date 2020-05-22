@@ -7,7 +7,6 @@ drizzlepac/hlautils/svm_quality_analysis.py and stores it as a Pandas DataFrame"
 import argparse
 import collections
 import glob
-import json
 import os
 import pdb
 import sys
@@ -178,7 +177,7 @@ def json_harvester(json_search_path=os.getcwd(), log_level=logutil.logging.INFO,
         master_dataframe.to_csv(output_filename)
         log.info("Wrote dataframe to {}".format(output_filename))
 
-    make_default_json_config_file(master_dataframe)
+    # make_default_json_config_file(master_dataframe)
     return master_dataframe
 
 
