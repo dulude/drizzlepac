@@ -73,6 +73,8 @@ def flatten_dict(dd, separator='.', prefix=''):
     -------
     a version of input dictionary *dd* that has been flattened by one layer
     """
+    # TODO: From Michele...Just FYI - there is a Python package, flatten-dict, which will both flatten
+    #  dict-like objects and unflatten those objects!
     return {prefix + separator + k if prefix else k: v
             for kk, vv in dd.items()
             for k, v in flatten_dict(vv, separator, kk).items()
@@ -310,3 +312,4 @@ if __name__ == "__main__":
     json_harvester(json_search_path=user_args.json_search_path,
                    log_level=log_level,
                    output_filename=user_args.output_filename)
+
