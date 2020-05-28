@@ -31,7 +31,6 @@ def make_config_file():
     for json_filetype in json_filetype_list:
         print(json_filetype)
         output_json_dict = process_json_filetype(json_filetype, output_json_dict)
-    pdb.set_trace()
     # write out output_json_dict to a json file
     output_json_filename = 'json_harvester_config.json'
     if os.path.exists(output_json_filename):
@@ -67,11 +66,17 @@ def process_json_filetype(json_filetype, output_json_dict):
         print("json file: ",json_filename)
         json_data = du.read_json_file(json_filename)
 
-        # add "header" section
+        # add "header" section just once
         if "header" not in output_json_dict.keys():
             output_json_dict['header'] = []
             for header_item in json_data['header'].keys():
                 output_json_dict['header'].append(header_item)
+
+        # add "general information" section just once
+        if "general information" not in output_json_dict.keys():
+            output_json_dict['general information'] = collections.OrderedDict()
+            for gi_item in json_data['general information'].keys():
+                output_json_dict['general information'][gi_item] = "Human-readable title"
     else:
         print("     No {} files found!".format(json_filetype))
     return output_json_dict
