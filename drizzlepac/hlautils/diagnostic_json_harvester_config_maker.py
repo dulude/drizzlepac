@@ -4,6 +4,7 @@
 diagnostic_json_harvester.py"""
 
 # Standard library imports
+import collections
 import glob
 import json
 import pdb
@@ -11,18 +12,61 @@ import pdb
 # Local application imports
 import drizzlepac.hlautils.diagnostic_utils as du
 
+# ------------------------------------------------------------------------------------------------------------
 
 def make_config_file():
-    filetype_list = []
-    json_file_list = glob.glob("*_svm_*.json")
-    for json_filename  in json_file_list:
-        json_filetype = json_filename.split("_svm_")[1]
-        if json_filetype not in filetype_list:
-            filetype_list.append(json_filetype)
-            print(json_filename)
-            json_data = du.read_json_file(json_filename)
-            pdb.set_trace()
+    """Main calling subroutine"""
+    # Create list of json filetypes
+    json_filetype_list = []
+    split_string = "_svm_"
+    for json_filename  in glob.glob("*{}*.json".format(split_string)):
+        json_filetype = split_string+json_filename.split(split_string)[1]
+        if json_filetype not in json_filetype_list:
+            json_filetype_list.append(json_filetype)
+    del(json_filetype)
+    
+    # process each json filetype
+    output_json_dict = collections.OrderedDict()
+    for json_filetype in json_filetype_list:
+        print(json_filetype)
+        output_json_dict = process_json_filetype(json_filetype, output_json_dict)
 
+    # write out output_json_dict to a json file
+    output_json_filename = 'json_harvester_config.json'
+    if os.path.exists(output_json_filename):
+        os.remove(output_json_filename)
+    with open(output_json_filename, 'w') as f:
+        json.dump(output_json_dict, f, indent=4)
+    print("Wrote ",output_json_filename)
+# ------------------------------------------------------------------------------------------------------------
+
+
+def process_json_filetype(json_filetype, output_json_dict):
+    """builds new section in output_json_dict based on the information stored in, and the the structure of
+    specified json filetype.
+
+    Parameters
+    ----------
+    json_filetype : str
+        the type of json file to process.
+
+    output_json_dict : ordered dictionary
+        ordered dictionary containing information that tells json_harvester how to process each type of json
+        file
+
+    Returns
+    -------
+    output_json_dict : ordered dictionary
+        ordered dictionary containing information that tells json_harvester how to process each type of json
+        file updated to include information from the json filetype specified in json_filetype.
+    """
+    json_files = glob.glob("*v"+json_filetype)
+    if json_files:
+        print("     ",json_files)
+    else:
+        print("     No {} files found!".format(json_filetype))
+    return output_json_dict
+    # json_data = du.read_json_file(json_filename)
 
 # ======================================================================================================================
 
