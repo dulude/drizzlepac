@@ -7,6 +7,7 @@ diagnostic_json_harvester.py"""
 import collections
 import glob
 import json
+import os
 import pdb
 
 # Local application imports
@@ -19,7 +20,7 @@ def make_config_file():
     # Create list of json filetypes
     json_filetype_list = []
     split_string = "_svm_"
-    for json_filename  in glob.glob("*{}*.json".format(split_string)):
+    for json_filename in glob.glob("*{}*.json".format(split_string)):
         json_filetype = split_string+json_filename.split(split_string)[1]
         if json_filetype not in json_filetype_list:
             json_filetype_list.append(json_filetype)
@@ -30,7 +31,7 @@ def make_config_file():
     for json_filetype in json_filetype_list:
         print(json_filetype)
         output_json_dict = process_json_filetype(json_filetype, output_json_dict)
-
+    pdb.set_trace()
     # write out output_json_dict to a json file
     output_json_filename = 'json_harvester_config.json'
     if os.path.exists(output_json_filename):
@@ -60,13 +61,21 @@ def process_json_filetype(json_filetype, output_json_dict):
         ordered dictionary containing information that tells json_harvester how to process each type of json
         file updated to include information from the json filetype specified in json_filetype.
     """
-    json_files = glob.glob("*v"+json_filetype)
+    json_files = glob.glob("*"+json_filetype)
     if json_files:
-        print("     ",json_files)
+        json_filename = json_files[0]
+        print("json file: ",json_filename)
+        json_data = du.read_json_file(json_filename)
+
+        # add "header" section
+        if "header" not in output_json_dict.keys():
+            output_json_dict['header'] = []
+            for header_item in json_data['header'].keys():
+                output_json_dict['header'].append(header_item)
     else:
         print("     No {} files found!".format(json_filetype))
     return output_json_dict
-    # json_data = du.read_json_file(json_filename)
+
 
 # ======================================================================================================================
 
