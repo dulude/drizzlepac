@@ -13,6 +13,17 @@ import pdb
 # Local application imports
 import drizzlepac.hlautils.diagnostic_utils as du
 
+def add_meta_item(dd):
+    dd=collections.OrderedDict(dd)
+    dd['meta'] = "Human-readable title placeholder"
+    dd.move_to_end('meta', last=False)
+    for k in dd.keys():
+        if isinstance(dd[k], dict):
+            dd[k] = add_meta_item(dd[k])
+    return dd
+# ------------------------------------------------------------------------------------------------------------
+
+
 def convert_nested(dct):
     # empty dict to store the result
     result = dict()
@@ -48,8 +59,6 @@ def flatten_dict(dd, separator='.', prefix=''):
     -------
     a version of input dictionary *dd* that has been flattened by one layer
     """
-    # TODO: From Michele...Just FYI - there is a Python package, flatten-dict, which will both flatten
-    #  dict-like objects and unflatten those objects!
     return {prefix + separator + k if prefix else k: v
             for kk, vv in dd.items()
             for k, v in flatten_dict(vv, separator, kk).items()
@@ -141,15 +150,16 @@ def process_json_filetype(json_filetype, output_json_dict):
                     out_flattened_data["{}.{}".format(flat_key,coltitle)] = placeholder_tuple
             else:
                 out_flattened_data[flat_key] = placeholder_tuple
-        for flat_key in out_flattened_data.keys():
-            print("           ",flat_key,out_flattened_data[flat_key])
+        for flat_key in out_flattened_data.keys(): # TODO: REMOVE
+            nest_level = len(flat_key.split(".")) # TODO: REMOVE
+            print("     {}{}{}".format("      "*nest_level,flat_key,out_flattened_data[flat_key])) # TODO: REMOVE
         # re-nest flattened dictionary and update output_json_dict
-        output_json_dict[json_filetype] = convert_nested(out_flattened_data)
+        out_dict = collections.OrderedDict(convert_nested(out_flattened_data))
+        out_dict = add_meta_item(out_dict)
+        output_json_dict[json_filetype] = out_dict
     else:
         print("     No {} files found!".format(json_filetype))
     return output_json_dict
-
-
 
 
 # ======================================================================================================================
@@ -157,4 +167,4 @@ def process_json_filetype(json_filetype, output_json_dict):
 if __name__ == "__main__":
     make_config_file()
 
-# TODO: Add "Meta" item at the start of each nested dictionary
+# TODO: Figure out how to deal with custom-named "PrimaryWCS_ippsss" _svm_wcs.json subsections
