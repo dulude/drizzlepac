@@ -66,6 +66,18 @@ def convert_nested(dct):
 
 # ------------------------------------------------------------------------------------------------------------
 
+def filter_header(header_keys):
+    """filters out unwanted/unneeded header items
+
+    Parameters
+    ----------
+    header_keys :
+
+    """
+
+    pdb.set_trace()
+    return header_keys
+# ------------------------------------------------------------------------------------------------------------
 
 def flatten_dict(dd, separator='.', prefix=''):
     """Recursive subroutine to flatten nested dictionaries down into a single-layer dictionary.
@@ -169,6 +181,7 @@ def process_json_filetype(json_filetype, output_json_dict):
         # add "header" section just once
         if "header" not in output_json_dict.keys():
             output_json_dict['header'] = []
+            header_keys = filter_header(json_data['header'].keys())
             for header_item in json_data['header'].keys():
                 output_json_dict['header'].append(header_item)
 
