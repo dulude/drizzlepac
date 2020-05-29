@@ -78,8 +78,8 @@ def make_config_file():
     # process each json filetype
     output_json_dict = collections.OrderedDict()
     for json_filetype in json_filetype_list:
-        print(json_filetype)
         output_json_dict = process_json_filetype(json_filetype, output_json_dict)
+
     # write out output_json_dict to a json file
     output_json_filename = 'json_harvester_config.json'
     if os.path.exists(output_json_filename):
@@ -128,18 +128,23 @@ def process_json_filetype(json_filetype, output_json_dict):
                 output_json_dict['general information'][gi_item] = "Human-readable title placeholder"
 
         # update output_json_dict with information about the specified json file type
-        # if json_filetype != "_svm_photometry.json": # TODO: REMOVE
-        #     return output_json_dict # TODO: REMOVE
-        output_json_dict[json_filetype] = collections.OrderedDict()
-        for section_name in json_data['data'].keys():
-            # flatten out nested dictionaries
-            flattened_data = flatten_dict(json_data['data'][section_name])
-            # replace all values with a placeholder tuple
-            for flat_key in flattened_data:
-                print("           ",flat_key,type(flattened_data[flat_key]))
-                flattened_data[flat_key] = ("Human-readable title placeholder", "units placeholder")
-            # renest flattened dictionary and update output_json_dict
-            output_json_dict[json_filetype][section_name] = convert_nested(flattened_data)
+        # flatten out nested dictionaries
+        flattened_data = flatten_dict(json_data['data'])
+        out_flattened_data = collections.OrderedDict()
+
+        # replace all values with a placeholder tuple
+        placeholder_tuple = ("Human-readable title placeholder", "units placeholder")
+        for flat_key in flattened_data.keys():
+            # extract column names from embedded astropy tables and add them to the dictionary
+            if str(type(flattened_data[flat_key])) == "<class 'astropy.table.table.Table'>":
+                for coltitle in flattened_data[flat_key].colnames:
+                    out_flattened_data["{}.{}".format(flat_key,coltitle)] = placeholder_tuple
+            else:
+                out_flattened_data[flat_key] = placeholder_tuple
+        for flat_key in out_flattened_data.keys():
+            print("           ",flat_key,out_flattened_data[flat_key])
+        # re-nest flattened dictionary and update output_json_dict
+        output_json_dict[json_filetype] = convert_nested(out_flattened_data)
     else:
         print("     No {} files found!".format(json_filetype))
     return output_json_dict
@@ -151,3 +156,5 @@ def process_json_filetype(json_filetype, output_json_dict):
 
 if __name__ == "__main__":
     make_config_file()
+
+# TODO: Add "Meta" item at the start of each nested dictionary
