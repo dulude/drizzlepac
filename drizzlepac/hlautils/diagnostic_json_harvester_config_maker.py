@@ -13,6 +13,8 @@ import pdb
 # Local application imports
 import drizzlepac.hlautils.diagnostic_utils as du
 
+# ============================================================================================================
+
 def add_meta_item(dd):
     """recursively add 'meta" item with placeholder value at the start of each nested dictionary
 
@@ -38,6 +40,18 @@ def add_meta_item(dd):
 
 
 def convert_nested(dct):
+    """re-nest flattened dictionary
+
+    Parameters
+    ----------
+    dct : dictionary
+        flattened dictionary to be re-nested.
+
+    Returns
+    -------
+    result : dictionary
+        re-nested version of input dictionary
+    """
     # empty dict to store the result
     result = dict()
 
@@ -81,6 +95,20 @@ def flatten_dict(dd, separator='.', prefix=''):
 # ------------------------------------------------------------------------------------------------------------
 
 def insert(dct, lst):
+    """Inserts input list lst in to input dictionary dct as a nested dictionary
+
+    Parameters
+    ----------
+    dct : dictionary
+        dictionary to update
+
+    lst : list
+        list to insert into dct
+
+    Returns
+    -------
+    Nothing, but dct is updated
+    """
     for x in lst[:-2]:
         dct[x] = dct = dct.get(x, dict())
     dct.update({lst[-2]: lst[-1]})
@@ -178,7 +206,7 @@ def process_json_filetype(json_filetype, output_json_dict):
     return output_json_dict
 
 
-# ======================================================================================================================
+# ============================================================================================================
 
 if __name__ == "__main__":
     make_config_file()
