@@ -14,6 +14,18 @@ import pdb
 import drizzlepac.hlautils.diagnostic_utils as du
 
 def add_meta_item(dd):
+    """recursively add 'meta" item with placeholder value at the start of each nested dictionary
+
+    Parameters
+    ----------
+    dd : Ordered Dict
+        dictionary to process
+
+    Returns
+    -------
+    dd : Ordered Dict
+        updated dictionary
+    """
     dd=collections.OrderedDict(dd)
     dd['meta'] = "Human-readable title placeholder"
     dd.move_to_end('meta', last=False)
@@ -21,6 +33,7 @@ def add_meta_item(dd):
         if isinstance(dd[k], dict):
             dd[k] = add_meta_item(dd[k])
     return dd
+
 # ------------------------------------------------------------------------------------------------------------
 
 
@@ -36,6 +49,7 @@ def convert_nested(dct):
     for lst in lsts:
         insert(result, lst)
     return result
+
 # ------------------------------------------------------------------------------------------------------------
 
 
@@ -153,9 +167,11 @@ def process_json_filetype(json_filetype, output_json_dict):
         for flat_key in out_flattened_data.keys(): # TODO: REMOVE
             nest_level = len(flat_key.split(".")) # TODO: REMOVE
             print("     {}{}{}".format("      "*nest_level,flat_key,out_flattened_data[flat_key])) # TODO: REMOVE
-        # re-nest flattened dictionary and update output_json_dict
+        # re-nest flattened dictionary
         out_dict = collections.OrderedDict(convert_nested(out_flattened_data))
+        # Add 'meta' item at every level of nested dictionary
         out_dict = add_meta_item(out_dict)
+        # update output_json_dict
         output_json_dict[json_filetype] = out_dict
     else:
         print("     No {} files found!".format(json_filetype))
