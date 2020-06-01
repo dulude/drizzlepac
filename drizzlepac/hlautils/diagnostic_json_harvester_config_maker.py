@@ -74,7 +74,16 @@ def filter_header(header_keys):
     header_keys :
 
     """
-
+    items_to_remove=[]
+    for item in header_keys:
+        item = item.lower()
+        for ending in ['corr','tab','file']:
+            if item.endswith(ending):
+                items_to_remove.append(item)
+        if item.startswith("d0") and not item.endswith('data'):
+            items_to_remove.append(item)
+    for item in items_to_remove:
+        print(item)
     pdb.set_trace()
     return header_keys
 # ------------------------------------------------------------------------------------------------------------
