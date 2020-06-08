@@ -148,9 +148,11 @@ def make_config_file():
     del(json_filetype)
     
     # process each json filetype
+    tot_length = 0
     output_json_dict = collections.OrderedDict()
     for json_filetype in json_filetype_list:
-        output_json_dict = process_json_filetype(json_filetype, output_json_dict)
+        output_json_dict, length = process_json_filetype(json_filetype, output_json_dict)
+        tot_length += length
 
     # write out output_json_dict to a json file
     output_json_filename = 'json_harvester_config.json'
@@ -159,6 +161,7 @@ def make_config_file():
     with open(output_json_filename, 'w') as f:
         json.dump(output_json_dict, f, indent=4)
     print("Wrote ",output_json_filename)
+    print(tot_length)
 # ------------------------------------------------------------------------------------------------------------
 
 
@@ -181,6 +184,7 @@ def process_json_filetype(json_filetype, output_json_dict):
         ordered dictionary containing information that tells json_harvester how to process each type of json
         file updated to include information from the json filetype specified in json_filetype.
     """
+
     json_files = glob.glob("*"+json_filetype)
     if json_files:
         json_filename = json_files[0]
@@ -225,7 +229,7 @@ def process_json_filetype(json_filetype, output_json_dict):
         output_json_dict[json_filetype] = out_dict
     else:
         print("     No {} files found!".format(json_filetype))
-    return output_json_dict
+    return output_json_dict, len(out_flattened_data.keys())
 
 
 # ============================================================================================================
